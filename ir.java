@@ -8,13 +8,13 @@ import java.util.Scanner;
 
 public class ir {
 
-   private static ArrayList<String> words; //holds all words
+   private static List<String> words; //holds all words
 
    private static List<Map<String, Integer>> docs; //sample docs
 
-   public static ArrayList<Double> getTermFreq(Map<String, Integer> doc) {
+   public static List<Double> getTermFreq(Map<String, Integer> doc) {
       Set<String> keys = doc.keySet();
-      ArrayList<Double> freqs = new ArrayList<Double>();
+      List<Double> freqs = new ArrayList<Double>();
       int max = 0;
       
       for (String s : doc.keySet().toArray(new String[0])) {
