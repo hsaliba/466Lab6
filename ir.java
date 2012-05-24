@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Scanner;
 
-
 public class ir {
 
    private static List<String> words; //holds all words
