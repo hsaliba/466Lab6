@@ -1,5 +1,8 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,15 +10,15 @@ import java.util.Scanner;
 
 public class ir {
 
-   private static List<String> words; //holds all words
-
+   private static Set<String> words; //holds all words
+   private static List<List<String>> documents = new ArrayList<List<String>> (); //holds the document raw text
    private static List<Map<String, Integer>> docs; //sample docs
 
    public static List<Double> getTermFreq(Map<String, Integer> doc) {
       Set<String> keys = doc.keySet();
       List<Double> freqs = new ArrayList<Double>();
       int max = 0;
-      
+
       for (String s : doc.keySet().toArray(new String[0])) {
          if (doc.get(s).intValue() > max) 
             max = doc.get(s).intValue();
@@ -28,7 +31,7 @@ public class ir {
             freqs.add((doc.get(s).doubleValue()/max) * log2(docs.size()/num));
          }
          else 
-           freqs.add(0.0); 
+            freqs.add(0.0); 
       }
       return freqs;
    }
@@ -38,7 +41,7 @@ public class ir {
    }
 
    public static void createBogusInfo() {
-      words = new ArrayList<String>();
+      words = new HashSet<String>();
       docs = new ArrayList<Map<String, Integer>>();
       HashMap<String, Integer> doc = new HashMap<String, Integer>();
       words.add("a");
@@ -74,7 +77,15 @@ public class ir {
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
          if (line[0].compareTo("READ") == 0 && line.length == 2) {
-            System.out.println("   read");
+            try {
+               if (line[1].endsWith(".xml")) {
+                  readXML(line[1]);
+               } else {
+                  readText(line[1]);
+               }
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
          }
          else if (line[0].compareTo("LIST") == 0) {
 
@@ -106,5 +117,28 @@ public class ir {
          }
          System.out.print("IR> ");
       }
+   }
+
+   private static void readXML(String string) {
+      
+   }
+
+   private static void readText(String file) throws FileNotFoundException {
+      Scanner scan = new Scanner(new File(file));
+      String temp = null;
+      String[] split = null;
+      StringBuilder docText = new StringBuilder();
+      while(scan.hasNextLine()) {
+         temp = scan.nextLine();
+         docText.append(temp);
+         docText.append("\n");
+         split = temp.split(" .!?,(){}[]\"':;<>/-");
+         for(String word : split) {
+            words.add(word);
+         }
+      }
+      List<String> toAdd = new ArrayList<String>();
+      toAdd.add(docText.toString());
+      documents.add(toAdd);
    }
 }
