@@ -1,15 +1,19 @@
-import java.util.*;
-import java.lang.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Scanner;
+
 
 public class ir {
 
    private static ArrayList<String> words; //holds all words
 
-   private static ArrayList<HashMap<String, Integer>> docs; //sample docs
+   private static List<Map<String, Integer>> docs; //sample docs
 
-   public static ArrayList<Double> getTermFreq(HashMap<String, Integer> doc) {
-      Set keys = doc.keySet();
+   public static ArrayList<Double> getTermFreq(Map<String, Integer> doc) {
+      Set<String> keys = doc.keySet();
       ArrayList<Double> freqs = new ArrayList<Double>();
       int max = 0;
       
@@ -36,7 +40,7 @@ public class ir {
 
    public static void createBogusInfo() {
       words = new ArrayList<String>();
-      docs = new ArrayList<HashMap<String, Integer>>();
+      docs = new ArrayList<Map<String, Integer>>();
       HashMap<String, Integer> doc = new HashMap<String, Integer>();
       words.add("a");
       words.add("i");
