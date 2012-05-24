@@ -69,10 +69,10 @@ public class ir {
       catch (Exception e) {
          System.out.println("Caught: "+e);
       }
-
+      System.out.println("IR System Version 1.0");
+      System.out.print("IR> ");
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
-
          if (line[0].compareTo("READ") == 0 && line.length == 2) {
             System.out.println("   read");
          }
@@ -104,6 +104,7 @@ public class ir {
          else {
             System.out.println("   invalid command");
          }
+         System.out.print("IR> ");
       }
    }
 }
