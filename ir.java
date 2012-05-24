@@ -4,6 +4,57 @@ import java.io.*;
 
 public class ir {
 
+   private static ArrayList<String> words; //holds all words
+
+   private static ArrayList<HashMap<String, Integer>> docs; //sample docs
+
+   public static ArrayList<Double> getTermFreq(HashMap<String, Integer> doc) {
+      Set keys = doc.keySet();
+      ArrayList<Double> freqs = new ArrayList<Double>();
+      int max = 0;
+      
+      for (String s : doc.keySet().toArray(new String[0])) {
+         if (doc.get(s).intValue() > max) 
+            max = doc.get(s).intValue();
+      }
+
+      for (String s : words) {
+         if (keys.contains(s)) {
+            //need to calculate how many docs word occurs in 
+            double num = 1.0;
+            freqs.add((doc.get(s).doubleValue()/max) * log2(docs.size()/num));
+         }
+         else 
+           freqs.add(0.0); 
+      }
+      return freqs;
+   }
+
+   private static double log2(double x) {
+      return Math.log(x)/Math.log(2);
+   }
+
+   public static void createBogusInfo() {
+      words = new ArrayList<String>();
+      docs = new ArrayList<HashMap<String, Integer>>();
+      HashMap<String, Integer> doc = new HashMap<String, Integer>();
+      words.add("a");
+      words.add("i");
+      words.add("in");
+      words.add("to");
+      words.add("cat");
+      words.add("dog");  
+
+      doc.put("a", 1);
+      doc.put("dog", 10);
+      doc.put("to", 3);
+      docs.add(doc);
+      doc =  new HashMap<String, Integer>();
+      doc.put("i", 5);
+      doc.put("to", 3);
+      doc.put("cat", 8);
+      docs.add(doc);
+   } 
 
    public static void main(String[] args) {
 
@@ -34,6 +85,9 @@ public class ir {
          }
          else if (line[0].compareTo("SHOW") == 0) {
             System.out.println("   show");
+            createBogusInfo();
+            System.out.println(getTermFreq(docs.get(0)));
+            System.out.println(getTermFreq(docs.get(1)));
          }
          else if (line[0].compareTo("SIM") == 0) {
             System.out.println("   sim");
@@ -47,7 +101,6 @@ public class ir {
          else {
             System.out.println("   invalid command");
          }
-
       }
    }
 }
