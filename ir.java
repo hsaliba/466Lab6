@@ -123,7 +123,7 @@ public class ir {
       System.out.print("IR> ");
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
-         if (line[0].compareTo("READ") == 0) {
+         if (line[0].compareToIgnoreCase("READ") == 0) {
             if (line.length == 2) {
                try {
                   if (line[1].endsWith(".xml")) {
@@ -134,7 +134,7 @@ public class ir {
                } catch (Exception e) {
                   e.printStackTrace();
                }
-            } else if(line.length == 3 && line[1].compareTo("LIST") == 0) {
+            } else if(line.length == 3 && line[1].compareToIgnoreCase("LIST") == 0) {
                try {
                   readList(line[2]);
                } catch (FileNotFoundException e) {
@@ -142,36 +142,35 @@ public class ir {
                }
             }
          }
-         else if (line[0].compareTo("LIST") == 0) {
-
+         else if (line[0].compareToIgnoreCase("LIST") == 0) {
             listDocIDs();
          }
-         else if (line[0].compareTo("CLEAR") == 0) {
+         else if (line[0].compareToIgnoreCase("CLEAR") == 0) {
             System.out.println("   clear");
          }
-         else if (line[0].compareTo("PRINT") == 0 && line.length == 2) {
+         else if (line[0].compareToIgnoreCase("PRINT") == 0 && line.length == 2) {
             if(documents.containsKey(line[1])) {
                System.out.println(documents.get(line[1]));
             }
          }
-         else if (line[0].compareTo("SHOW") == 0) {
+         else if (line[0].compareToIgnoreCase("SHOW") == 0) {
             System.out.println("   show");
             //createBogusInfo();
             List<Double> vect = getTermFreq(docs.get(line[1]));
             printVect(vect);
          }
-         else if (line[0].compareTo("SIM") == 0) {
+         else if (line[0].compareToIgnoreCase("SIM") == 0) {
             System.out.println("   sim");
          }
-         else if (line[0].compareTo("SEARCH") == 0)  {
+         else if (line[0].compareToIgnoreCase("SEARCH") == 0)  {
             System.out.println("   search");
          }
-         else if (line[0].compareTo("QUIT") == 0) {
+         else if (line[0].compareToIgnoreCase("QUIT") == 0) {
             break;
          }
-         else if(line[0].equals("DOCWORDS") && line.length == 2) {      //for debug purposes
+         else if(line[0].equalsIgnoreCase("DOCWORDS") && line.length == 2) {      //for debug purposes
             debug(line[1]);
-         }else if(line[0].equals("ALLWORDS")) {     //for debug purposes
+         }else if(line[0].equalsIgnoreCase("ALLWORDS")) {     //for debug purposes
             System.out.println(words);
          }
          else {
