@@ -168,9 +168,9 @@ public class ir {
          else if (line[0].compareTo("QUIT") == 0) {
             break;
          }
-         else if(line[0].equals("a")) {
+         else if(line[0].equals("DOCWORDS")) {      //for debug purposes
             debug(line[1]);
-         }else if(line[0].equals("b")) {
+         }else if(line[0].equals("ALLWORDS")) {     //for debug purposes
             System.out.println(words);
          }
          else {
