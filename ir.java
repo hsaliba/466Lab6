@@ -149,6 +149,8 @@ public class ir {
          else if (line[0].compareToIgnoreCase("PRINT") == 0 && line.length == 2) {
             if(documents.containsKey(line[1])) {
                System.out.println(documents.get(line[1]));
+            } else {
+               System.out.println("Document not found.");
             }
          }
          else if (line[0].compareToIgnoreCase("SHOW") == 0) {
@@ -179,9 +181,9 @@ public class ir {
    }
 
    private static void clear() {
-      words = new ArrayList<String> ();
-      documents = new HashMap<String, String> ();
-      docs = new HashMap<String, Map<String, Integer>>();    
+      words.clear();
+      documents.clear();
+      docs.clear();    
    }
 
    private static void debug(String string) {
@@ -194,8 +196,7 @@ public class ir {
       Collections.sort(list);
       for(String docID : list) {
          System.out.println(docID);
-      }
-      
+      }    
    }
 
    private static void readXML(String file) throws ParserConfigurationException, SAXException, IOException{
