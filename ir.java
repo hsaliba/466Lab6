@@ -21,9 +21,9 @@ import org.xml.sax.SAXException;
 
 public class ir {
 
-   private static Set<String> words = new HashSet<String> (); //holds all words
+   private static List<String> words = new ArrayList<String> (); //holds all words
    private static Map<String, String> documents = new HashMap<String, String> (); //doc ID hashed to actual document content
-   private static List<Map<String, Integer>> docs; //sample docs
+   private static List<Map<String, Integer>> docs = new ArrayList<Map<String, Integer>>(); //sample docs 
    private static String stopWordFile = "stopwords.txt";
    private static Set<String> stopWords = new HashSet<String> ();
    
@@ -58,7 +58,6 @@ public class ir {
    }
 
    public static void createBogusInfo() {
-      docs = new ArrayList<Map<String, Integer>>();
       HashMap<String, Integer> doc = new HashMap<String, Integer>();
       words.add("a");
       words.add("i");
@@ -75,9 +74,14 @@ public class ir {
       doc.put("i", 5);
       doc.put("to", 3);
       doc.put("cat", 8);
-      System.out.println(words);
       docs.add(doc);
    } 
+   
+   public static void printVect(List<Double> vect) {
+      for (int i = 0; i < vect.size(); i++) 
+         if (Double.compare(vect.get(i), 0) != 0)
+            System.out.println(words.get(i) + " " + vect.get(i));
+   }
 
    public static void main(String[] args) {
       try {
@@ -129,9 +133,14 @@ public class ir {
          }
          else if (line[0].compareTo("SHOW") == 0) {
             System.out.println("   show");
-            createBogusInfo();
-            System.out.println(getTermFreq(docs.get(0)));
-            System.out.println(getTermFreq(docs.get(1)));
+            try {
+               createBogusInfo();
+               List<Double> vect = getTermFreq(docs.get(Integer.parseInt(line[1])));
+               printVect(vect);
+            }
+            catch (NumberFormatException e) {
+               System.out.println("   id not a number");
+            }
          }
          else if (line[0].compareTo("SIM") == 0) {
             System.out.println("   sim");
