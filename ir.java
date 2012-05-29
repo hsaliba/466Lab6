@@ -25,7 +25,7 @@ public class ir {
    private static List<String> words = new ArrayList<String> (); //holds all words
    private static Map<String, String> documents = new HashMap<String, String> (); //doc ID hashed to actual document content
    private static Map<String, Map<String, Integer>> docs = new HashMap<String, Map<String, Integer>>(); //sample docs 
-   private static String stopWordFile = "stopwords.txt";
+   private final static String stopWordFile = "stopwords.txt";
    private static Set<String> stopWords = new HashSet<String> ();
    
    public static List<Double> getTermFreq(Map<String, Integer> doc) {
@@ -87,7 +87,6 @@ public class ir {
    public static double cosineSim(List<Double> v1, List<Double> v2) {
       int size = (v1.size() > v2.size()) ? v1.size() : v2.size();      
       double top = 0.0, bot1 = 0.0, bot2 = 0.0;
-
       for (int i = 0; i < size; i++) {
          double val1 = 0.0, val2 = 0.0;
          if (i < v1.size())
@@ -99,7 +98,6 @@ public class ir {
          bot1 += val1*val1;
          bot2 += val2*val2; 
       }
-
       return top/Math.sqrt(bot1*bot2);
    } 
 
@@ -146,7 +144,7 @@ public class ir {
             listDocIDs();
          }
          else if (line[0].compareToIgnoreCase("CLEAR") == 0) {
-            System.out.println("   clear");
+            clear();
          }
          else if (line[0].compareToIgnoreCase("PRINT") == 0 && line.length == 2) {
             if(documents.containsKey(line[1])) {
@@ -178,6 +176,12 @@ public class ir {
          }
          System.out.print("IR> ");
       }
+   }
+
+   private static void clear() {
+      words = new ArrayList<String> ();
+      documents = new HashMap<String, String> ();
+      docs = new HashMap<String, Map<String, Integer>>();    
    }
 
    private static void debug(String string) {
