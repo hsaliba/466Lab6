@@ -23,7 +23,7 @@ public class ir {
 
    private static List<String> words = new ArrayList<String> (); //holds all words
    private static Map<String, String> documents = new HashMap<String, String> (); //doc ID hashed to actual document content
-   private static List<Map<String, Integer>> docs = new ArrayList<Map<String, Integer>>(); //sample docs 
+   private static Map<String, Map<String, Integer>> docs = new HashMap<String, Map<String, Integer>>(); //sample docs 
    private static String stopWordFile = "stopwords.txt";
    private static Set<String> stopWords = new HashSet<String> ();
    
@@ -56,7 +56,7 @@ public class ir {
    private static double log2(double x) {
       return Math.log(x)/Math.log(2);
    }
-
+/*
    public static void createBogusInfo() {
       HashMap<String, Integer> doc = new HashMap<String, Integer>();
       words.add("a");
@@ -76,7 +76,7 @@ public class ir {
       doc.put("cat", 8);
       docs.add(doc);
    } 
-   
+*/ 
    public static void printVect(List<Double> vect) {
       for (int i = 0; i < vect.size(); i++) 
          if (Double.compare(vect.get(i), 0) != 0)
@@ -142,7 +142,7 @@ public class ir {
          else if (line[0].compareTo("SHOW") == 0) {
             System.out.println("   show");
             try {
-               createBogusInfo();
+               //createBogusInfo();
                List<Double> vect = getTermFreq(docs.get(Integer.parseInt(line[1])));
                printVect(vect);
             }
@@ -186,6 +186,7 @@ public class ir {
                System.out.println("Error! Document with same ID already exists");
                return;
             }
+            HashMap<String, Integer> toAdd = new HashMap<String, Integer> ();
             Scanner scan = new Scanner(eElement.getTextContent());
             String temp = null;
             String[] split = null;
@@ -197,10 +198,18 @@ public class ir {
                split = temp.split(" [.!?,(){}\":;<>/\\-]");
                for(String word : split) {
                   if(!stopWords.contains(word)) {
-                     words.add(word);
+                     if(!words.contains(word)) {
+                        words.add(word);
+                     }
+                     if(!toAdd.containsKey(word)) {
+                        toAdd.put(word, 0);
+                     } else {
+                        toAdd.put(word, toAdd.get(word) + 1);
+                     }
                   }
                }
             }
+            docs.put(name, toAdd);
             documents.put(name, docText.toString());
          }
       }
@@ -215,6 +224,7 @@ public class ir {
       String temp = null;
       String[] split = null;
       StringBuilder docText = new StringBuilder();
+      HashMap<String, Integer> toAdd = new HashMap<String, Integer> ();
       while(scan.hasNextLine()) {
          temp = scan.nextLine();
          docText.append(temp);
@@ -222,10 +232,18 @@ public class ir {
          split = temp.split(" [.!?,(){}\":;<>/\\-]");
          for(String word : split) {
             if(!stopWords.contains(word)) {
-               words.add(word);
+               if(!words.contains(word)) {
+                  words.add(word);
+               }
+               if(!toAdd.containsKey(word)) {
+                  toAdd.put(word, 0);
+               } else {
+                  toAdd.put(word, toAdd.get(word) + 1);
+               }
             }
          }
       }
+      docs.put(file, toAdd);
       documents.put(file, docText.toString());
    }
    
