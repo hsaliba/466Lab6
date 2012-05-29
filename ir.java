@@ -83,6 +83,14 @@ public class ir {
             System.out.println(words.get(i) + " " + vect.get(i));
    }
 
+   public static double cosineSim(List<Double> v1, List<Double> v2) {
+      
+
+
+
+   } 
+
+
    public static void main(String[] args) {
       try {
          readStopWords();
