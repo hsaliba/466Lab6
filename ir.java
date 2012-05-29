@@ -205,18 +205,15 @@ public class ir {
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       Document doc = dBuilder.parse(fXmlFile);
       doc.getDocumentElement().normalize();
-
       NodeList nList = doc.getElementsByTagName("joke");
       int j = 1;
       for (int i = 0; i < nList.getLength(); i++) {
- 
          Node nNode = nList.item(i);
          if (nNode.getNodeType() == Node.ELEMENT_NODE) {
- 
             Element eElement = (Element) nNode;
             String name = file + "-" + j++;
             if(documents.containsKey(name)) {
-               System.out.println("Error! Document with same ID already exists");
+               System.out.println("Error! Document with same ID already exists: " + name);
                return;
             }
             HashMap<String, Integer> toAdd = new HashMap<String, Integer> ();
@@ -254,7 +251,7 @@ public class ir {
 
    private static void readText(String file) throws FileNotFoundException {
       if(documents.containsKey(file)) {
-         System.out.println("Error! Document with same ID already exists");
+         System.out.println("Error! Document with same ID already exists: " + file);
          return;
       }
       Scanner scan = new Scanner(new File(file));
