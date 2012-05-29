@@ -83,6 +83,26 @@ public class ir {
             System.out.println(words.get(i) + " " + vect.get(i));
    }
 
+   public static double cosineSim(List<Double> v1, List<Double> v2) {
+      int size = (v1.size() > v2.size()) ? v1.size() : v2.size();      
+      double top = 0.0, bot1 = 0.0, bot2 = 0.0;
+
+      for (int i = 0; i < size; i++) {
+         double val1 = 0.0, val2 = 0.0;
+         if (i < v1.size())
+            val1 = v1.get(i);
+         if (i < v2.size())
+            val2 = v2.get(i);
+
+         top += val1*val2;
+         bot1 += val1*val1;
+         bot2 += val2*val2; 
+      }
+
+      return top/Math.sqrt(bot1*bot2);
+   } 
+
+
    public static void main(String[] args) {
       try {
          readStopWords();
@@ -133,14 +153,9 @@ public class ir {
          }
          else if (line[0].compareTo("SHOW") == 0) {
             System.out.println("   show");
-            try {
-               //createBogusInfo();
-               List<Double> vect = getTermFreq(docs.get(Integer.parseInt(line[1])));
-               printVect(vect);
-            }
-            catch (NumberFormatException e) {
-               System.out.println("   id not a number");
-            }
+            //createBogusInfo();
+            List<Double> vect = getTermFreq(docs.get(line[1]));
+            printVect(vect);
          }
          else if (line[0].compareTo("SIM") == 0) {
             System.out.println("   sim");
