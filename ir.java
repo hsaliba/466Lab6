@@ -186,8 +186,8 @@ public class ir {
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       Document doc = dBuilder.parse(fXmlFile);
       doc.getDocumentElement().normalize();
- 
-      NodeList nList = doc.getElementsByTagName("document");
+
+      NodeList nList = doc.getElementsByTagName("joke");
       int j = 1;
       for (int i = 0; i < nList.getLength(); i++) {
  
