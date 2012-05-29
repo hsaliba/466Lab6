@@ -10,10 +10,12 @@ import java.util.Scanner;
 
 public class ir {
 
-   private static Set<String> words; //holds all words
+   private static Set<String> words = new HashSet<String> (); //holds all words
    private static List<List<String>> documents = new ArrayList<List<String>> (); //holds the document raw text
    private static List<Map<String, Integer>> docs; //sample docs
-
+   private static String stopWordFile = "stopwords.txt";
+   private static Set<String> stopWords = new HashSet<String> ();
+   
    public static List<Double> getTermFreq(Map<String, Integer> doc) {
       Set<String> keys = doc.keySet();
       List<Double> freqs = new ArrayList<Double>();
@@ -41,7 +43,6 @@ public class ir {
    }
 
    public static void createBogusInfo() {
-      words = new HashSet<String>();
       docs = new ArrayList<Map<String, Integer>>();
       HashMap<String, Integer> doc = new HashMap<String, Integer>();
       words.add("a");
@@ -119,7 +120,7 @@ public class ir {
       }
    }
 
-   private static void readXML(String string) {
+   private static void readXML(String string) throws FileNotFoundException{
       
    }
 
@@ -132,13 +133,23 @@ public class ir {
          temp = scan.nextLine();
          docText.append(temp);
          docText.append("\n");
-         split = temp.split(" .!?,(){}[]\"':;<>/-");
+         split = temp.split(" .!?,(){}[]\":;<>/-");
          for(String word : split) {
-            words.add(word);
+            if(!stopWords.contains(word)) {
+               words.add(word);
+            }
          }
       }
       List<String> toAdd = new ArrayList<String>();
       toAdd.add(docText.toString());
       documents.add(toAdd);
+      
+   }
+   
+   private static void readStopWords() throws FileNotFoundException {
+      Scanner scan = new Scanner(new File(stopWordFile));
+      while(scan.hasNext()) {
+         stopWords.add(scan.next());
+      }
    }
 }
