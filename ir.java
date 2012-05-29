@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,12 +9,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Scanner;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 public class ir {
 
-   private static Set<String> words; //holds all words
-   private static List<List<String>> documents = new ArrayList<List<String>> (); //holds the document raw text
+   private static Set<String> words = new HashSet<String> (); //holds all words
+   private static Map<String, String> documents = new HashMap<String, String> (); //doc ID hashed to actual document content
    private static List<Map<String, Integer>> docs; //sample docs
-
+   private static String stopWordFile = "stopwords.txt";
+   private static Set<String> stopWords = new HashSet<String> ();
+   
    public static List<Double> getTermFreq(Map<String, Integer> doc) {
       Set<String> keys = doc.keySet();
       List<Double> freqs = new ArrayList<Double>();
@@ -45,7 +58,6 @@ public class ir {
    }
 
    public static void createBogusInfo() {
-      words = new HashSet<String>();
       docs = new ArrayList<Map<String, Integer>>();
       HashMap<String, Integer> doc = new HashMap<String, Integer>();
       words.add("a");
@@ -68,7 +80,12 @@ public class ir {
    } 
 
    public static void main(String[] args) {
-
+      try {
+         readStopWords();
+      } catch (FileNotFoundException e1) {
+         e1.printStackTrace();
+         System.exit(-1);
+      }
       Scanner sc = null;
       String delims = "[ ]+";
       try {
@@ -77,19 +94,27 @@ public class ir {
       catch (Exception e) {
          System.out.println("Caught: "+e);
       }
-      System.out.println("IR System Version 1.0");
+      System.out.println("IR  System Version 1.0");
       System.out.print("IR> ");
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
-         if (line[0].compareTo("READ") == 0 && line.length == 2) {
-            try {
-               if (line[1].endsWith(".xml")) {
-                  readXML(line[1]);
-               } else {
-                  readText(line[1]);
+         if (line[0].compareTo("READ") == 0) {
+            if (line.length == 2) {
+               try {
+                  if (line[1].endsWith(".xml")) {
+                     readXML(line[1]);
+                  } else {
+                     readText(line[1]);
+                  }
+               } catch (Exception e) {
+                  e.printStackTrace();
                }
-            } catch (Exception e) {
-               e.printStackTrace();
+            } else if(line.length == 3 && line[1].compareTo("LIST") == 0) {
+               try {
+                  readList(line[2]);
+               } catch (FileNotFoundException e) {
+                  e.printStackTrace();
+               }
             }
          }
          else if (line[0].compareTo("LIST") == 0) {
@@ -124,11 +149,51 @@ public class ir {
       }
    }
 
-   private static void readXML(String string) {
-      
+   private static void readXML(String file) throws ParserConfigurationException, SAXException, IOException{
+      File fXmlFile = new File(file);
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(fXmlFile);
+      doc.getDocumentElement().normalize();
+ 
+      NodeList nList = doc.getElementsByTagName("document");
+      int j = 1;
+      for (int i = 0; i < nList.getLength(); i++) {
+ 
+         Node nNode = nList.item(i);
+         if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+ 
+            Element eElement = (Element) nNode;
+            String name = file + "-" + j++;
+            if(documents.containsKey(name)) {
+               System.out.println("Error! Document with same ID already exists");
+               return;
+            }
+            Scanner scan = new Scanner(eElement.getTextContent());
+            String temp = null;
+            String[] split = null;
+            StringBuilder docText = new StringBuilder();
+            while(scan.hasNextLine()) {
+               temp = scan.nextLine();
+               docText.append(temp);
+               docText.append("\n");
+               split = temp.split(" [.!?,(){}\":;<>/\\-]");
+               for(String word : split) {
+                  if(!stopWords.contains(word)) {
+                     words.add(word);
+                  }
+               }
+            }
+            documents.put(name, docText.toString());
+         }
+      }
    }
 
    private static void readText(String file) throws FileNotFoundException {
+      if(documents.containsKey(file)) {
+         System.out.println("Error! Document with same ID already exists");
+         return;
+      }
       Scanner scan = new Scanner(new File(file));
       String temp = null;
       String[] split = null;
@@ -137,13 +202,27 @@ public class ir {
          temp = scan.nextLine();
          docText.append(temp);
          docText.append("\n");
-         split = temp.split(" .!?,(){}[]\"':;<>/-");
+         split = temp.split(" [.!?,(){}\":;<>/\\-]");
          for(String word : split) {
-            words.add(word);
+            if(!stopWords.contains(word)) {
+               words.add(word);
+            }
          }
       }
-      List<String> toAdd = new ArrayList<String>();
-      toAdd.add(docText.toString());
-      documents.add(toAdd);
+      documents.put(file, docText.toString());
+   }
+   
+   private static void readStopWords() throws FileNotFoundException {
+      Scanner scan = new Scanner(new File(stopWordFile));
+      while(scan.hasNext()) {
+         stopWords.add(scan.next());
+      }
+   }
+   
+   private static void readList(String file) throws FileNotFoundException {
+      Scanner scan = new Scanner(new File(file));
+      while (scan.hasNextLine()) {
+         readText(scan.nextLine());
+      }
    }
 }
