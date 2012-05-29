@@ -41,8 +41,8 @@ public class ir {
          if (keys.contains(s)) {
             //need to calculate how many docs word occurs in 
             int num = 0;
-            for (int i = 0; i < docs.size(); i++) 
-               if (docs.get(i).containsKey(s))
+            for (String k : docs.keySet().toArray(new String[0])) 
+               if (docs.get(k).containsKey(s))
                   num++;
 
             freqs.add((doc.get(s).doubleValue()/max) * log2((double)docs.size()/num));
@@ -144,6 +144,7 @@ public class ir {
          else if (line[0].compareTo("LIST") == 0) {
 
             listDocIDs();
+            //System.out.println("\n\n"+docs);
          }
          else if (line[0].compareTo("CLEAR") == 0) {
             System.out.println("   clear");
@@ -154,6 +155,7 @@ public class ir {
          else if (line[0].compareTo("SHOW") == 0) {
             //createBogusInfo();
             List<Double> vect = getTermFreq(docs.get(line[1]));
+            System.out.println(vect);
             printVect(vect);
          }
          else if (line[0].compareTo("SIM") == 0) {
