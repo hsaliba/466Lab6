@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -168,7 +169,7 @@ public class ir {
          else if (line[0].compareTo("QUIT") == 0) {
             break;
          }
-         else if(line[0].equals("DOCWORDS")) {      //for debug purposes
+         else if(line[0].equals("DOCWORDS") && line.length == 2) {      //for debug purposes
             debug(line[1]);
          }else if(line[0].equals("ALLWORDS")) {     //for debug purposes
             System.out.println(words);
@@ -186,7 +187,9 @@ public class ir {
    }
 
    private static void listDocIDs() {
-      for(String docID : documents.keySet()) {
+      List<String> list = new ArrayList<String>(documents.keySet());
+      Collections.sort(list);
+      for(String docID : list) {
          System.out.println(docID);
       }
       
