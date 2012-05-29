@@ -32,16 +32,17 @@ public class ir {
       List<Double> freqs = new ArrayList<Double>();
       int max = 0;
 
-      for (String s : doc.keySet().toArray(new String[0])) {
+      for (String s : doc.keySet()) 
          if (doc.get(s).intValue() > max) 
             max = doc.get(s).intValue();
-      }
+      
 
       for (String s : words) {
+         System.out.println(s);
          if (keys.contains(s)) {
             //need to calculate how many docs word occurs in 
             int num = 0;
-            for (String k : docs.keySet().toArray(new String[0])) 
+            for (String k : docs.keySet())
                if (docs.get(k).containsKey(s))
                   num++;
 
