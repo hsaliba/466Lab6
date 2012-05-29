@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 public class ir {
 
    private static Set<String> words = new HashSet<String> (); //holds all words
-   private static List<List<String>> documents = new ArrayList<List<String>> (); //holds the document raw text
+   private static Map<String, String> documents = new HashMap<String, String> (); //doc ID hashed to actual document content
    private static List<Map<String, Integer>> docs; //sample docs
    private static String stopWordFile = "stopwords.txt";
    private static Set<String> stopWords = new HashSet<String> ();
@@ -143,17 +143,30 @@ public class ir {
       Document doc = dBuilder.parse(fXmlFile);
       doc.getDocumentElement().normalize();
  
-      //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
       NodeList nList = doc.getElementsByTagName("document");
-      System.out.println("-----------------------");
+      for (int i = 0; i < nList.getLength(); i++) {
  
-      for (int temp = 0; temp < nList.getLength(); temp++) {
- 
-         Node nNode = nList.item(temp);
+         Node nNode = nList.item(i);
          if (nNode.getNodeType() == Node.ELEMENT_NODE) {
  
             Element eElement = (Element) nNode;
-            System.out.println(eElement.getTextContent() + "asdasdas  ");
+            String name = eElement.getAttribute("name");
+            Scanner scan = new Scanner(eElement.getTextContent());
+            String temp = null;
+            String[] split = null;
+            StringBuilder docText = new StringBuilder();
+            while(scan.hasNextLine()) {
+               temp = scan.nextLine();
+               docText.append(temp);
+               docText.append("\n");
+               split = temp.split(" [.!?,(){}\":;<>/\\-]");
+               for(String word : split) {
+                  if(!stopWords.contains(word)) {
+                     words.add(word);
+                  }
+               }
+            }
+            documents.put(name, docText.toString());
          }
       }
    }
@@ -174,9 +187,7 @@ public class ir {
             }
          }
       }
-      List<String> toAdd = new ArrayList<String>();
-      toAdd.add(docText.toString());
-      documents.add(toAdd);
+      documents.put(file, docText.toString());
    }
    
    private static void readStopWords() throws FileNotFoundException {
