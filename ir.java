@@ -202,20 +202,24 @@ public class ir {
             String temp = null;
             String[] split = null;
             StringBuilder docText = new StringBuilder();
+            Stemmer stem = new Stemmer();
             while(scan.hasNextLine()) {
                temp = scan.nextLine();
                docText.append(temp);
                docText.append("\n");
                split = temp.split(" [.!?,(){}\":;<>/\\-]");
                for(String word : split) {
-                  if(!stopWords.contains(word)) {
-                     if(!words.contains(word)) {
-                        words.add(word);
+                  stem.add(word.toLowerCase().toCharArray(), word.length());
+                  stem.stem();
+                  String stemmedWord = stem.toString();
+                  if(!stopWords.contains(stemmedWord)) {
+                     if(!words.contains(stemmedWord)) {
+                        words.add(stemmedWord);
                      }
-                     if(!toAdd.containsKey(word)) {
-                        toAdd.put(word, 0);
+                     if(!toAdd.containsKey(stemmedWord)) {
+                        toAdd.put(stemmedWord, 0);
                      } else {
-                        toAdd.put(word, toAdd.get(word) + 1);
+                        toAdd.put(stemmedWord, toAdd.get(stemmedWord) + 1);
                      }
                   }
                }
@@ -236,20 +240,24 @@ public class ir {
       String[] split = null;
       StringBuilder docText = new StringBuilder();
       HashMap<String, Integer> toAdd = new HashMap<String, Integer> ();
+      Stemmer stem = new Stemmer();
       while(scan.hasNextLine()) {
          temp = scan.nextLine();
          docText.append(temp);
          docText.append("\n");
          split = temp.split(" [.!?,(){}\":;<>/\\-]");
          for(String word : split) {
-            if(!stopWords.contains(word)) {
-               if(!words.contains(word)) {
-                  words.add(word);
+            stem.add(word.toLowerCase().toCharArray(), word.length());
+            stem.stem();
+            String stemmedWord = stem.toString();
+            if(!stopWords.contains(stemmedWord)) {
+               if(!words.contains(stemmedWord)) {
+                  words.add(stemmedWord);
                }
-               if(!toAdd.containsKey(word)) {
-                  toAdd.put(word, 0);
+               if(!toAdd.containsKey(stemmedWord)) {
+                  toAdd.put(stemmedWord, 0);
                } else {
-                  toAdd.put(word, toAdd.get(word) + 1);
+                  toAdd.put(stemmedWord, toAdd.get(stemmedWord) + 1);
                }
             }
          }
