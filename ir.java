@@ -148,8 +148,10 @@ public class ir {
          else if (line[0].compareTo("CLEAR") == 0) {
             System.out.println("   clear");
          }
-         else if (line[0].compareTo("PRINT") == 0) {
-            System.out.println("   print");
+         else if (line[0].compareTo("PRINT") == 0 && line.length == 2) {
+            if(documents.containsKey(line[1])) {
+               System.out.println(documents.get(line[1]));
+            }
          }
          else if (line[0].compareTo("SHOW") == 0) {
             System.out.println("   show");
