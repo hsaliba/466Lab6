@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Scanner;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class ir {
 
@@ -64,7 +75,12 @@ public class ir {
    } 
 
    public static void main(String[] args) {
-
+      try {
+         readStopWords();
+      } catch (FileNotFoundException e1) {
+         e1.printStackTrace();
+         System.exit(-1);
+      }
       Scanner sc = null;
       String delims = "[ ]+";
       try {
@@ -73,7 +89,7 @@ public class ir {
       catch (Exception e) {
          System.out.println("Caught: "+e);
       }
-      System.out.println("IR System Version 1.0");
+      System.out.println("IR  System Version 1.0");
       System.out.print("IR> ");
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
@@ -120,8 +136,26 @@ public class ir {
       }
    }
 
-   private static void readXML(String string) throws FileNotFoundException{
-      
+   private static void readXML(String file) throws ParserConfigurationException, SAXException, IOException{
+      File fXmlFile = new File(file);
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(fXmlFile);
+      doc.getDocumentElement().normalize();
+ 
+      //System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+      NodeList nList = doc.getElementsByTagName("document");
+      System.out.println("-----------------------");
+ 
+      for (int temp = 0; temp < nList.getLength(); temp++) {
+ 
+         Node nNode = nList.item(temp);
+         if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+ 
+            Element eElement = (Element) nNode;
+            System.out.println(eElement.getTextContent() + "asdasdas  ");
+         }
+      }
    }
 
    private static void readText(String file) throws FileNotFoundException {
@@ -133,7 +167,7 @@ public class ir {
          temp = scan.nextLine();
          docText.append(temp);
          docText.append("\n");
-         split = temp.split(" .!?,(){}[]\":;<>/-");
+         split = temp.split(" [.!?,(){}\":;<>/\\-]");
          for(String word : split) {
             if(!stopWords.contains(word)) {
                words.add(word);
@@ -143,7 +177,6 @@ public class ir {
       List<String> toAdd = new ArrayList<String>();
       toAdd.add(docText.toString());
       documents.add(toAdd);
-      
    }
    
    private static void readStopWords() throws FileNotFoundException {
