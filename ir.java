@@ -168,11 +168,21 @@ public class ir {
          else if (line[0].compareTo("QUIT") == 0) {
             break;
          }
+         else if(line[0].equals("a")) {
+            debug(line[1]);
+         }else if(line[0].equals("b")) {
+            System.out.println(words);
+         }
          else {
             System.out.println("   invalid command");
          }
          System.out.print("IR> ");
       }
+   }
+
+   private static void debug(String string) {
+      System.out.println(docs.get(string));
+      
    }
 
    private static void listDocIDs() {
@@ -217,12 +227,12 @@ public class ir {
                   stem.add(word.toLowerCase().toCharArray(), word.length());
                   stem.stem();
                   String stemmedWord = stem.toString();
-                  if(!stopWords.contains(stemmedWord)) {
+                  if(!stemmedWord.isEmpty() && !stopWords.contains(stemmedWord)) {
                      if(!words.contains(stemmedWord)) {
                         words.add(stemmedWord);
                      }
                      if(!toAdd.containsKey(stemmedWord)) {
-                        toAdd.put(stemmedWord, 0);
+                        toAdd.put(stemmedWord, 1);
                      } else {
                         toAdd.put(stemmedWord, toAdd.get(stemmedWord) + 1);
                      }
@@ -255,12 +265,12 @@ public class ir {
             stem.add(word.toLowerCase().toCharArray(), word.length());
             stem.stem();
             String stemmedWord = stem.toString();
-            if(!stopWords.contains(stemmedWord)) {
+            if(!stemmedWord.isEmpty() && !stopWords.contains(stemmedWord)) {
                if(!words.contains(stemmedWord)) {
                   words.add(stemmedWord);
                }
                if(!toAdd.containsKey(stemmedWord)) {
-                  toAdd.put(stemmedWord, 0);
+                  toAdd.put(stemmedWord, 1);
                } else {
                   toAdd.put(stemmedWord, toAdd.get(stemmedWord) + 1);
                }
