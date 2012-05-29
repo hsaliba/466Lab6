@@ -144,13 +144,18 @@ public class ir {
       doc.getDocumentElement().normalize();
  
       NodeList nList = doc.getElementsByTagName("document");
+      int j = 1;
       for (int i = 0; i < nList.getLength(); i++) {
  
          Node nNode = nList.item(i);
          if (nNode.getNodeType() == Node.ELEMENT_NODE) {
  
             Element eElement = (Element) nNode;
-            String name = eElement.getAttribute("name");
+            String name = file + "-" + j++;
+            if(documents.containsKey(name)) {
+               System.out.println("Error! Document with same ID already exists");
+               return;
+            }
             Scanner scan = new Scanner(eElement.getTextContent());
             String temp = null;
             String[] split = null;
@@ -172,6 +177,10 @@ public class ir {
    }
 
    private static void readText(String file) throws FileNotFoundException {
+      if(documents.containsKey(file)) {
+         System.out.println("Error! Document with same ID already exists");
+         return;
+      }
       Scanner scan = new Scanner(new File(file));
       String temp = null;
       String[] split = null;
@@ -194,6 +203,13 @@ public class ir {
       Scanner scan = new Scanner(new File(stopWordFile));
       while(scan.hasNext()) {
          stopWords.add(scan.next());
+      }
+   }
+   
+   private static void readList(String file) throws FileNotFoundException {
+      Scanner scan = new Scanner(new File(file));
+      while (scan.hasNextLine()) {
+         readText(scan.nextLine());
       }
    }
 }
