@@ -152,13 +152,17 @@ public class ir {
             System.out.println("   print");
          }
          else if (line[0].compareTo("SHOW") == 0) {
-            System.out.println("   show");
             //createBogusInfo();
             List<Double> vect = getTermFreq(docs.get(line[1]));
             printVect(vect);
          }
          else if (line[0].compareTo("SIM") == 0) {
-            System.out.println("   sim");
+            List<Double> v1 = getTermFreq(docs.get(line[2]));
+            List<Double> v2 = getTermFreq(docs.get(line[3]));
+            if (line[1].compareTo("COS") == 0) 
+               System.out.println("Cosine similarity between "
+                +line[2]+" and "+line[3]+" is "+cosineSim(v1, v2));
+
          }
          else if (line[0].compareTo("SEARCH") == 0)  {
             System.out.println("   search");
