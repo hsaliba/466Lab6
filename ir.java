@@ -93,15 +93,23 @@ public class ir {
       System.out.print("IR> ");
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
-         if (line[0].compareTo("READ") == 0 && line.length == 2) {
-            try {
-               if (line[1].endsWith(".xml")) {
-                  readXML(line[1]);
-               } else {
-                  readText(line[1]);
+         if (line[0].compareTo("READ") == 0) {
+            if (line.length == 2) {
+               try {
+                  if (line[1].endsWith(".xml")) {
+                     readXML(line[1]);
+                  } else {
+                     readText(line[1]);
+                  }
+               } catch (Exception e) {
+                  e.printStackTrace();
                }
-            } catch (Exception e) {
-               e.printStackTrace();
+            } else if(line.length == 3 && line[1].compareTo("LIST") == 0) {
+               try {
+                  readList(line[2]);
+               } catch (FileNotFoundException e) {
+                  e.printStackTrace();
+               }
             }
          }
          else if (line[0].compareTo("LIST") == 0) {
