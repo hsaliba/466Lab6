@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<documents>
-<document name="haha"> BLAH BLAH BLOOH
+<jokes>
+<joke name="haha"> BLAH BLAH BLOOH
 
 BLAHing
-</document>
-<document name="ddddddDD">
+</joke>
+<joke name="ddddddDD">
 A B C D E F G H I J K L
-</document>
-</documents>
+</joke>
+</jokes>
