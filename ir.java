@@ -27,8 +27,12 @@ public class ir {
       for (String s : words) {
          if (keys.contains(s)) {
             //need to calculate how many docs word occurs in 
-            double num = 1.0;
-            freqs.add((doc.get(s).doubleValue()/max) * log2(docs.size()/num));
+            int num = 0;
+            for (int i = 0; i < docs.size(); i++) 
+               if (docs.get(i).containsKey(s))
+                  num++;
+
+            freqs.add((doc.get(s).doubleValue()/max) * log2((double)docs.size()/num));
          }
          else 
             freqs.add(0.0); 
@@ -59,6 +63,7 @@ public class ir {
       doc.put("i", 5);
       doc.put("to", 3);
       doc.put("cat", 8);
+      System.out.println(words);
       docs.add(doc);
    } 
 
