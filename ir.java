@@ -212,7 +212,7 @@ public class ir {
                temp = scan.nextLine();
                docText.append(temp);
                docText.append("\n");
-               split = temp.split(" [.!?,(){}\":;<>/\\-]");
+               split = temp.split("[ .!?,(){}\":;<>/\\-]");
                for(String word : split) {
                   stem.add(word.toLowerCase().toCharArray(), word.length());
                   stem.stem();
@@ -250,7 +250,7 @@ public class ir {
          temp = scan.nextLine();
          docText.append(temp);
          docText.append("\n");
-         split = temp.split(" [.!?,(){}\":;<>/\\-]");
+         split = temp.split("[ .!?,(){}\":;<>/\\-]");
          for(String word : split) {
             stem.add(word.toLowerCase().toCharArray(), word.length());
             stem.stem();
