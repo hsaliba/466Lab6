@@ -143,7 +143,7 @@ public class ir {
          }
          else if (line[0].compareTo("LIST") == 0) {
 
-            System.out.println("   list");
+            listDocIDs();
          }
          else if (line[0].compareTo("CLEAR") == 0) {
             System.out.println("   clear");
@@ -175,6 +175,13 @@ public class ir {
          }
          System.out.print("IR> ");
       }
+   }
+
+   private static void listDocIDs() {
+      for(String docID : documents.keySet()) {
+         System.out.println(docID);
+      }
+      
    }
 
    private static void readXML(String file) throws ParserConfigurationException, SAXException, IOException{
