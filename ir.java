@@ -1,6 +1,10 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +31,7 @@ public class ir {
    private static Map<String, Map<String, Integer>> docs = new HashMap<String, Map<String, Integer>>(); //sample docs 
    private final static String stopWordFile = "stopwords.txt";
    private static Set<String> stopWords = new HashSet<String> ();
+   private static final String saveFileName = "saveFile.sav";
    
    public static List<Double> getTermFreq(Map<String, Integer> doc) {
       Set<String> keys = doc.keySet();
@@ -105,8 +110,12 @@ public class ir {
    public static void main(String[] args) {
       try {
          readStopWords();
+         readPersisted();
       } catch (FileNotFoundException e1) {
          e1.printStackTrace();
+         System.exit(-1);
+      } catch (Exception e) {
+         e.printStackTrace();
          System.exit(-1);
       }
       Scanner sc = null;
@@ -178,6 +187,35 @@ public class ir {
          }
          System.out.print("IR> ");
       }
+      try {
+         persistData();
+      } catch (Exception e) {
+         e.printStackTrace();
+         System.exit(-1);
+      }
+   }
+
+   private static void persistData() throws IOException {
+      FileOutputStream saveFile = new FileOutputStream(saveFileName);
+      ObjectOutputStream save = new ObjectOutputStream(saveFile);
+      save.writeObject(words);
+      save.writeObject(documents);
+      save.writeObject(docs);
+      save.close();
+   }
+
+   @SuppressWarnings("unchecked")
+   private static void readPersisted() throws IOException, ClassNotFoundException {
+      FileInputStream saveFile;
+      try {
+         saveFile = new FileInputStream(saveFileName);
+      } catch (FileNotFoundException e) {
+         return;
+      }
+      ObjectInputStream restore = new ObjectInputStream(saveFile);
+      words = (List<String>)restore.readObject();
+      documents = (Map<String, String>)restore.readObject();
+      docs = (Map<String, Map<String, Integer>>)restore.readObject();
    }
 
    private static void clear() {
