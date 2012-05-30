@@ -216,6 +216,7 @@ public class ir {
       words = (List<String>)restore.readObject();
       documents = (Map<String, String>)restore.readObject();
       docs = (Map<String, Map<String, Integer>>)restore.readObject();
+      restore.close();
    }
 
    private static void clear() {
