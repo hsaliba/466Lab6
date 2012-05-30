@@ -1,7 +1,12 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +29,9 @@ public class ir {
    private static List<String> words = new ArrayList<String> (); //holds all words
    private static Map<String, String> documents = new HashMap<String, String> (); //doc ID hashed to actual document content
    private static Map<String, Map<String, Integer>> docs = new HashMap<String, Map<String, Integer>>(); //sample docs 
-   private static String stopWordFile = "stopwords.txt";
+   private final static String stopWordFile = "stopwords.txt";
    private static Set<String> stopWords = new HashSet<String> ();
+   private static final String saveFileName = "saveFile.sav";
    
    public static List<Double> getTermFreq(Map<String, Integer> doc) {
       Set<String> keys = doc.keySet();
@@ -87,7 +93,6 @@ public class ir {
    public static double cosineSim(List<Double> v1, List<Double> v2) {
       int size = (v1.size() > v2.size()) ? v1.size() : v2.size();      
       double top = 0.0, bot1 = 0.0, bot2 = 0.0;
-
       for (int i = 0; i < size; i++) {
          double val1 = 0.0, val2 = 0.0;
          if (i < v1.size())
@@ -99,7 +104,6 @@ public class ir {
          bot1 += val1*val1;
          bot2 += val2*val2; 
       }
-
       return top/Math.sqrt(bot1*bot2);
    } 
 
@@ -107,8 +111,12 @@ public class ir {
    public static void main(String[] args) {
       try {
          readStopWords();
+         readPersisted();
       } catch (FileNotFoundException e1) {
          e1.printStackTrace();
+         System.exit(-1);
+      } catch (Exception e) {
+         e.printStackTrace();
          System.exit(-1);
       }
       Scanner sc = null;
@@ -123,7 +131,7 @@ public class ir {
       System.out.print("IR> ");
       while (sc.hasNextLine()) {
          String[] line = sc.nextLine().split(delims);
-         if (line[0].compareTo("READ") == 0) {
+         if (line[0].compareToIgnoreCase("READ") == 0) {
             if (line.length == 2) {
                try {
                   if (line[1].endsWith(".xml")) {
@@ -134,7 +142,7 @@ public class ir {
                } catch (Exception e) {
                   e.printStackTrace();
                }
-            } else if(line.length == 3 && line[1].compareTo("LIST") == 0) {
+            } else if(line.length == 3 && line[1].compareToIgnoreCase("LIST") == 0) {
                try {
                   readList(line[2]);
                } catch (FileNotFoundException e) {
@@ -142,23 +150,24 @@ public class ir {
                }
             }
          }
-         else if (line[0].compareTo("LIST") == 0) {
-
+         else if (line[0].compareToIgnoreCase("LIST") == 0) {
             listDocIDs();
             //System.out.println("\n\n"+docs);
          }
-         else if (line[0].compareTo("CLEAR") == 0) {
-            System.out.println("   clear");
+         else if (line[0].compareToIgnoreCase("CLEAR") == 0) {
+            clear();
          }
-         else if (line[0].compareTo("PRINT") == 0 && line.length == 2) {
+         else if (line[0].compareToIgnoreCase("PRINT") == 0 && line.length == 2) {
             if(documents.containsKey(line[1])) {
                System.out.println(documents.get(line[1]));
+            } else {
+               System.out.println("Document not found.");
             }
          }
          else if (line[0].compareTo("SHOW") == 0) {
             //createBogusInfo();
             List<Double> vect = getTermFreq(docs.get(line[1]));
-            System.out.println(vect);
+         //   System.out.println(vect);
             printVect(vect);
          }
          else if (line[0].compareTo("SIM") == 0) {
@@ -167,26 +176,72 @@ public class ir {
             if (line[1].compareTo("COS") == 0) 
                System.out.println("Cosine similarity between "
                 +line[2]+" and "+line[3]+" is "+cosineSim(v1, v2));
-
          }
-         else if (line[0].compareTo("SEARCH") == 0)  {
+         else if (line[0].compareToIgnoreCase("SEARCH") == 0)  {
             System.out.println("   search");
          }
-         else if (line[0].compareTo("QUIT") == 0) {
+         else if (line[0].compareToIgnoreCase("QUIT") == 0) {
             break;
+         }
+         else if(line[0].equalsIgnoreCase("DOCWORDS") && line.length == 2) {      //for debug purposes
+            debug(line[1]);
+         }else if(line[0].equalsIgnoreCase("ALLWORDS")) {     //for debug purposes
+            System.out.println(words);
          }
          else {
             System.out.println("   invalid command");
          }
          System.out.print("IR> ");
       }
+      try {
+         persistData();
+      } catch (Exception e) {
+         e.printStackTrace();
+         System.exit(-1);
+      }
+   }
+
+   private static void persistData() throws IOException {
+      FileOutputStream saveFile = new FileOutputStream(saveFileName);
+      ObjectOutputStream save = new ObjectOutputStream(saveFile);
+      save.writeObject(words);
+      save.writeObject(documents);
+      save.writeObject(docs);
+      save.close();
+   }
+
+   @SuppressWarnings("unchecked")
+   private static void readPersisted() throws IOException, ClassNotFoundException {
+      FileInputStream saveFile;
+      try {
+         saveFile = new FileInputStream(saveFileName);
+      } catch (FileNotFoundException e) {
+         return;
+      }
+      ObjectInputStream restore = new ObjectInputStream(saveFile);
+      words = (List<String>)restore.readObject();
+      documents = (Map<String, String>)restore.readObject();
+      docs = (Map<String, Map<String, Integer>>)restore.readObject();
+      restore.close();
+   }
+
+   private static void clear() {
+      words.clear();
+      documents.clear();
+      docs.clear();    
+   }
+
+   private static void debug(String string) {
+      System.out.println(docs.get(string));
+      
    }
 
    private static void listDocIDs() {
-      for(String docID : documents.keySet()) {
+      List<String> list = new ArrayList<String>(documents.keySet());
+      Collections.sort(list);
+      for(String docID : list) {
          System.out.println(docID);
-      }
-      
+      }    
    }
 
    private static void readXML(String file) throws ParserConfigurationException, SAXException, IOException{
@@ -195,18 +250,15 @@ public class ir {
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       Document doc = dBuilder.parse(fXmlFile);
       doc.getDocumentElement().normalize();
-
       NodeList nList = doc.getElementsByTagName("joke");
       int j = 1;
       for (int i = 0; i < nList.getLength(); i++) {
- 
          Node nNode = nList.item(i);
          if (nNode.getNodeType() == Node.ELEMENT_NODE) {
- 
             Element eElement = (Element) nNode;
             String name = file + "-" + j++;
             if(documents.containsKey(name)) {
-               System.out.println("Error! Document with same ID already exists");
+               System.out.println("Error! Document with same ID already exists: " + name);
                return;
             }
             HashMap<String, Integer> toAdd = new HashMap<String, Integer> ();
@@ -224,12 +276,12 @@ public class ir {
                   stem.add(word.toLowerCase().toCharArray(), word.length());
                   stem.stem();
                   String stemmedWord = stem.toString();
-                  if(!stopWords.contains(stemmedWord)) {
+                  if(!stemmedWord.isEmpty() && !stopWords.contains(stemmedWord)) {
                      if(!words.contains(stemmedWord)) {
                         words.add(stemmedWord);
                      }
                      if(!toAdd.containsKey(stemmedWord)) {
-                        toAdd.put(stemmedWord, 0);
+                        toAdd.put(stemmedWord, 1);
                      } else {
                         toAdd.put(stemmedWord, toAdd.get(stemmedWord) + 1);
                      }
@@ -244,7 +296,7 @@ public class ir {
 
    private static void readText(String file) throws FileNotFoundException {
       if(documents.containsKey(file)) {
-         System.out.println("Error! Document with same ID already exists");
+         System.out.println("Error! Document with same ID already exists: " + file);
          return;
       }
       Scanner scan = new Scanner(new File(file));
@@ -262,12 +314,12 @@ public class ir {
             stem.add(word.toLowerCase().toCharArray(), word.length());
             stem.stem();
             String stemmedWord = stem.toString();
-            if(!stopWords.contains(stemmedWord)) {
+            if(!stemmedWord.isEmpty() && !stopWords.contains(stemmedWord)) {
                if(!words.contains(stemmedWord)) {
                   words.add(stemmedWord);
                }
                if(!toAdd.containsKey(stemmedWord)) {
-                  toAdd.put(stemmedWord, 0);
+                  toAdd.put(stemmedWord, 1);
                } else {
                   toAdd.put(stemmedWord, toAdd.get(stemmedWord) + 1);
                }
