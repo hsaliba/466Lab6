@@ -14,3 +14,8 @@ make
 
 RUN:
 java ir
+
+SPECIAL COMMANDS:
+SIM <COS|OKAPI> <doc1> <doc2> 
+instead of 
+SIM <doc1> <doc2> 
