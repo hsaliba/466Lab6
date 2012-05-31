@@ -44,7 +44,6 @@ public class ir {
       
 
       for (String s : words) {
-         System.out.println(s);
          if (keys.contains(s)) {
             //need to calculate how many docs word occurs in 
             int num = 0;
@@ -107,6 +106,26 @@ public class ir {
       return top/Math.sqrt(bot1*bot2);
    } 
 
+   public static double okapi(String d1, String d2) {
+      double k1 = 1.5, k2 = 500, b = .75; 
+      double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0; 
+      List<Double> v1 = getTermFreq(docs.get(d1));
+      List<Double> v2 = getTermFreq(docs.get(d2));
+      int size = (v1.size() > v2.size()) ? v2.size() : v2.size();
+      
+      for (int i = 0; i < words.size(); i++) {
+         int num = 0;
+         for (Map<String, Integer> m : docs) 
+            if (m.containsKey(words.get(i))) 
+               num++;
+
+         sum1 = Math.log((docs.size()-num+.5)/(num+.5));
+//         sum2 = ((k1+1) *   
+         System.out.println(documents.get(d1).length());
+      }
+   
+      return 0.0;
+   }
 
    public static void main(String[] args) {
       try {
@@ -171,11 +190,27 @@ public class ir {
             printVect(vect);
          }
          else if (line[0].compareTo("SIM") == 0) {
-            List<Double> v1 = getTermFreq(docs.get(line[2]));
-            List<Double> v2 = getTermFreq(docs.get(line[3]));
-            if (line[1].compareTo("COS") == 0) 
-               System.out.println("Cosine similarity between "
-                +line[2]+" and "+line[3]+" is "+cosineSim(v1, v2));
+            if (line.length == 4) {
+               Map<String, Integer> d1 = docs.get(line[2]);
+               Map<String, Integer> d2 = docs.get(line[3]);
+               if (d1 == null || d2 == null) 
+                  System.out.println("Invalid doc name");
+               else {
+                  List<Double> v1 = getTermFreq(d1);
+                  List<Double> v2 = getTermFreq(d2);
+                  if (line[1].compareTo("COS") == 0) 
+                     System.out.println("Cosine similarity between "
+                      +line[2]+" and "+line[3]+" is "+cosineSim(v1, v2));
+                  else if (line[1].compareTo("OKAPI") == 0) 
+                     System.out.println("Okapi similarity between "
+                      +line[2]+" and "+line[3]+" is "+okapi(line[2], line[3]));
+                  else
+                     System.out.println("Invalid similarity method");
+               }
+            }
+            else {
+               System.out.println("   SIM <COS | OKAPI> <doc1> <doc2>");
+            }
          }
          else if (line[0].compareToIgnoreCase("SEARCH") == 0)  {
             System.out.println("   search");
