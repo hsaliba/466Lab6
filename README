@@ -1,1 +1,16 @@
-asd
+PARTNERS:
+Stephanie Krapil (skrapil)
+Haikal Saliba (hsaliba)
+
+METHODS:
+weighting scheme: tf-idf
+similarity: cosine, okapi
+
+EXTRA CREDIT CLAIM:
+implemented both cosine and okapi
+
+COMPILE:
+make
+
+RUN:
+java ir
