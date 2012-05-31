@@ -62,27 +62,7 @@ public class ir {
    private static double log2(double x) {
       return Math.log(x)/Math.log(2);
    }
-/*
-   public static void createBogusInfo() {
-      HashMap<String, Integer> doc = new HashMap<String, Integer>();
-      words.add("a");
-      words.add("i");
-      words.add("in");
-      words.add("to");
-      words.add("cat");
-      words.add("dog");  
-
-      doc.put("a", 1);
-      doc.put("dog", 10);
-      doc.put("to", 3);
-      docs.add(doc);
-      doc =  new HashMap<String, Integer>();
-      doc.put("i", 5);
-      doc.put("to", 3);
-      doc.put("cat", 8);
-      docs.add(doc);
-   } 
-*/ 
+ 
    public static void printVect(List<Double> vect) {
       for (int i = 0; i < vect.size(); i++) 
          if (Double.compare(vect.get(i), 0) != 0)
@@ -134,6 +114,32 @@ public class ir {
       return ans;
    }
 
+   public static List<Double> parseSearch(String search) {
+      String delims = "[ .!?,(){}\":;<>/\\-]";
+      String[] line = search.split(delims);
+      Map<String, Integer> counts = new HashMap<String, Integer>();
+
+      for (String s : line) { 
+         Stemmer stem = new Stemmer();
+         stem.add(s.toLowerCase().toCharArray(), s.length());
+         stem.stem();
+         String stemmedWord = stem.toString();
+         if (!words.contains(stemmedWord))
+            words.add(stemmedWord);
+         if (counts.containsKey(stemmedWord)) 
+            counts.put(stemmedWord, counts.get(stemmedWord)+1);
+         else
+            counts.put(stemmedWord, 1);
+      }
+
+      return getTermFreq(counts); 
+   }
+
+   public static void genSearch(List<Double> query) {
+
+
+   } 
+
    public static void main(String[] args) {
       try {
          readStopWords();
@@ -178,7 +184,6 @@ public class ir {
          }
          else if (line[0].compareToIgnoreCase("LIST") == 0) {
             listDocIDs();
-            //System.out.println("\n\n"+docs);
          }
          else if (line[0].compareToIgnoreCase("CLEAR") == 0) {
             clear();
@@ -190,13 +195,11 @@ public class ir {
                System.out.println("Document not found.");
             }
          }
-         else if (line[0].compareTo("SHOW") == 0) {
-            //createBogusInfo();
+         else if (line[0].compareToIgnoreCase("SHOW") == 0) {
             List<Double> vect = getTermFreq(docs.get(line[1]));
-         //   System.out.println(vect);
             printVect(vect);
          }
-         else if (line[0].compareTo("SIM") == 0) {
+         else if (line[0].compareToIgnoreCase("SIM") == 0) {
             if (line.length == 4) {
                Map<String, Integer> d1 = docs.get(line[2]);
                Map<String, Integer> d2 = docs.get(line[3]);
@@ -205,10 +208,10 @@ public class ir {
                else {
                   List<Double> v1 = getTermFreq(d1);
                   List<Double> v2 = getTermFreq(d2);
-                  if (line[1].compareTo("COS") == 0) 
+                  if (line[1].compareToIgnoreCase("COS") == 0) 
                      System.out.println("Cosine similarity between "
                       +line[2]+" and "+line[3]+" is "+cosineSim(v1, v2));
-                  else if (line[1].compareTo("OKAPI") == 0) 
+                  else if (line[1].compareToIgnoreCase("OKAPI") == 0) 
                      System.out.println("Okapi similarity between "
                       +line[2]+" and "+line[3]+" is "+okapi(line[2], line[3]));
                   else
@@ -220,6 +223,10 @@ public class ir {
             }
          }
          else if (line[0].compareToIgnoreCase("SEARCH") == 0)  {
+            if (line[1].compareToIgnoreCase("DOC") == 0) {
+
+
+            }
             System.out.println("   search");
          }
          else if (line[0].compareToIgnoreCase("QUIT") == 0) {
