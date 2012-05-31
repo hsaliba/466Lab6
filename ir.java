@@ -108,23 +108,30 @@ public class ir {
 
    public static double okapi(String d1, String d2) {
       double k1 = 1.5, k2 = 500, b = .75; 
-      double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0; 
+      double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0, ans = 0.0; 
       List<Double> v1 = getTermFreq(docs.get(d1));
       List<Double> v2 = getTermFreq(docs.get(d2));
       int size = (v1.size() > v2.size()) ? v2.size() : v2.size();
+      double avgDocLen = 0.0;
+
+      for (String s : documents.keySet()) 
+         avgDocLen += documents.get(s).length();
+      avgDocLen = avgDocLen/documents.size();
+
       
       for (int i = 0; i < words.size(); i++) {
          int num = 0;
-         for (Map<String, Integer> m : docs) 
-            if (m.containsKey(words.get(i))) 
+         for (String s : docs.keySet()) 
+            if (docs.get(s).containsKey(words.get(i))) 
                num++;
 
          sum1 = Math.log((docs.size()-num+.5)/(num+.5));
-//         sum2 = ((k1+1) *   
-         System.out.println(documents.get(d1).length());
+         sum2 = ((k1+1)*v1.get(i)) / (k1*((1-b)+(b*documents.get(d1).length()/avgDocLen))+v1.get(i));
+         sum3 = ((k2+1)*v2.get(i)) / (k2+v2.get(i));
+         ans += sum1 * sum2 * sum3;
       }
    
-      return 0.0;
+      return ans;
    }
 
    public static void main(String[] args) {
