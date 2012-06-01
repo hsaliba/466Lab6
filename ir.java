@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -87,7 +89,7 @@ public class ir {
    } 
 
    public static double okapi(String d1, String d2) {
-      double k1 = 1.5, k2 = 500, b = .75; 
+      double k1 = 1.5, k2 = 1, b = .75; 
       double sum1 = 0.0, sum2 = 0.0, sum3 = 0.0, ans = 0.0; 
       List<Double> v1 = getTermFreq(docs.get(d1));
       List<Double> v2 = getTermFreq(docs.get(d2));
@@ -114,30 +116,64 @@ public class ir {
       return ans;
    }
 
-   public static List<Double> parseSearch(String search) {
+   public static List<Double> parseSearch(String[] search) {
       String delims = "[ .!?,(){}\":;<>/\\-]";
-      String[] line = search.split(delims);
       Map<String, Integer> counts = new HashMap<String, Integer>();
+      Stemmer stem = new Stemmer();
 
-      for (String s : line) { 
-         Stemmer stem = new Stemmer();
-         stem.add(s.toLowerCase().toCharArray(), s.length());
-         stem.stem();
-         String stemmedWord = stem.toString();
-         if (!words.contains(stemmedWord))
+      for (int i = 1; i < search.length; i++) {
+         String[] line = search[i].split(delims);
+          
+         for (String s : line) { 
+            stem.add(s.toLowerCase().toCharArray(), s.length());
+            stem.stem();
+            String stemmedWord = stem.toString();
+            if (!words.contains(stemmedWord) && stemmedWord.length() > 0)
             words.add(stemmedWord);
-         if (counts.containsKey(stemmedWord)) 
-            counts.put(stemmedWord, counts.get(stemmedWord)+1);
-         else
-            counts.put(stemmedWord, 1);
+            if (counts.containsKey(stemmedWord)) 
+               counts.put(stemmedWord, counts.get(stemmedWord)+1);
+            else
+               counts.put(stemmedWord, 1);
+         }
       }
-
+      
       return getTermFreq(counts); 
    }
 
    public static void genSearch(List<Double> query) {
+      LinkedList<String> docNames = new LinkedList<String>();
+      LinkedList<Double> docSim = new LinkedList<Double>();
 
+      for (String k : docs.keySet()) {
+         double sim = cosineSim(getTermFreq(docs.get(k)), query); 
+         if (Double.compare(sim, 0.0) != 0 && Double.compare(sim, 1.0) != 0) {
+            if (docSim.size() == 0) {
+               docSim.add(sim);
+               docNames.add(k);
+            }
+            else {
+               for (int i = 0; i < docSim.size(); i++) {
+                  if (Double.compare(docSim.get(i), sim) < 0) {
+                     docSim.add(i,sim);
+                     docNames.add(i, k);
+                     break; 
+                  }
+                  else if (docSim.size() == i) {
+                     docSim.addLast(sim);
+                     docNames.addLast(k); 
+                     break;
+                  }
+               }
+            }
+         }
+      }
 
+      System.out.println("Search Results: ");
+      if (docNames.size() == 0)
+         System.out.println("none found");
+      else
+         for (int i = 0; i < docSim.size(); i++) 
+            System.out.println(i+") "+docNames.get(i)+" "+docSim.get(i)); 
    } 
 
    public static void main(String[] args) {
@@ -172,7 +208,7 @@ public class ir {
                      readText(line[1]);
                   }
                } catch (Exception e) {
-                  e.printStackTrace();
+                  System.out.println("   could not find file");
                }
             } else if(line.length == 3 && line[1].compareToIgnoreCase("LIST") == 0) {
                try {
@@ -192,30 +228,39 @@ public class ir {
             if(documents.containsKey(line[1])) {
                System.out.println(documents.get(line[1]));
             } else {
-               System.out.println("Document not found.");
+               System.out.println("    Document not found.");
             }
          }
          else if (line[0].compareToIgnoreCase("SHOW") == 0) {
-            List<Double> vect = getTermFreq(docs.get(line[1]));
-            printVect(vect);
+            if (line.length == 2) {
+               Map<String, Integer> d = docs.get(line[1]);
+               if (d == null)
+                  System.out.println("   Invalid doc name");
+               else {
+                  List<Double> vect = getTermFreq(d);
+                  printVect(vect);
+               }
+            }
+            else
+               System.out.println("   SHOW <docId>");
          }
          else if (line[0].compareToIgnoreCase("SIM") == 0) {
             if (line.length == 4) {
                Map<String, Integer> d1 = docs.get(line[2]);
                Map<String, Integer> d2 = docs.get(line[3]);
                if (d1 == null || d2 == null) 
-                  System.out.println("Invalid doc name");
+                  System.out.println("   Invalid doc name");
                else {
                   List<Double> v1 = getTermFreq(d1);
                   List<Double> v2 = getTermFreq(d2);
                   if (line[1].compareToIgnoreCase("COS") == 0) 
-                     System.out.println("Cosine similarity between "
+                     System.out.println("   Cosine similarity between "
                       +line[2]+" and "+line[3]+" is "+cosineSim(v1, v2));
                   else if (line[1].compareToIgnoreCase("OKAPI") == 0) 
-                     System.out.println("Okapi similarity between "
+                     System.out.println("   Okapi similarity between "
                       +line[2]+" and "+line[3]+" is "+okapi(line[2], line[3]));
                   else
-                     System.out.println("Invalid similarity method");
+                     System.out.println("    Invalid similarity method");
                }
             }
             else {
@@ -223,11 +268,12 @@ public class ir {
             }
          }
          else if (line[0].compareToIgnoreCase("SEARCH") == 0)  {
-            if (line[1].compareToIgnoreCase("DOC") == 0) {
-
-
+            if (line.length == 3 && line[1].compareToIgnoreCase("DOC") == 0) {
+               genSearch(getTermFreq(docs.get(line[2])));
             }
-            System.out.println("   search");
+            else { 
+               genSearch(parseSearch(line));
+            }
          }
          else if (line[0].compareToIgnoreCase("QUIT") == 0) {
             break;

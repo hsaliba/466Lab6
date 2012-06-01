@@ -19,3 +19,6 @@ SPECIAL COMMANDS:
 SIM <COS|OKAPI> <doc1> <doc2> 
 instead of 
 SIM <doc1> <doc2> 
+
+lower case commands are accepted as well.
+ex: show doc1 instead of SHOW doc1
