@@ -278,11 +278,6 @@ public class ir {
          else if (line[0].compareToIgnoreCase("QUIT") == 0) {
             break;
          }
-         else if(line[0].equalsIgnoreCase("DOCWORDS") && line.length == 2) {      //for debug purposes
-            debug(line[1]);
-         }else if(line[0].equalsIgnoreCase("ALLWORDS")) {     //for debug purposes
-            System.out.println(words);
-         }
          else {
             System.out.println("   invalid command");
          }
